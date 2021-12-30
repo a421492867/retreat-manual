@@ -1,7 +1,8 @@
 # Java劝退手册
 
-### algorithm 算法
+### algorithm 算法  
 ### data-structure  数据结构
+- 算法与数据结构单独提出在 leetcode-101项目
 ### basic Java 基础
 ### concurrent Java并发编程
 ### JVM Java虚拟机
