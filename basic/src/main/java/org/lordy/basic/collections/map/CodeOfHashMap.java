@@ -101,5 +101,19 @@ public class CodeOfHashMap {
          * 负载因子
          * static final float DEFAULT_LOAD_FACTOR = 0.75f;
          */
+
+        /**
+         * put流程
+         * 1、首先进行哈希值的扰动 获取一个新的哈希值 (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16)
+         * 2、判断tab是否为空或者长度为0 如果是则进行扩容操作 if ((tab = table) == null || (n = tab.length) == 0)
+         *             n = (tab = resize()).length;
+         * 3、根据哈希值计算下标  如果对应的下标刚好没有存放数据 则直接插入 否则需要覆盖    p = tab[i = (n - 1) & hash]) == null
+         * 4、判断tab[i]是否为树节点 否则向链表中插入数据 是则向树中插入节点
+         * 5、如果链表中插入节点的时候 链表长度大于等于8 则需要树化 treeifyBin(tab, hash);
+         * 6、最后所有元素处理完成后 判断是否超过阈值 超过则扩容
+         *
+         * treeifyBin 是一个链表树化的方法 但不是所有的链表长度为8后都会转成树  还需要判断存放key值得数组桶长是否小于64  MIN_TREEIFY_CAPACITY 小于则扩容 扩容后链表长度缩短
+         */
+        map.put("key", "value");
     }
 }

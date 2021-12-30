@@ -18,3 +18,21 @@
 > 虚引用 : 一个对象仅持有虚引用 那么它就和没有任何引用一样 在任何时候都可能被回收 主要用来跟踪对象被垃圾回收器回收的活动
 > 
 ### HashMap源码分析
+> HaspMap put流程图
+![avatar](./src/HashMap_put.png)
+
+
+### HashSet的实现原理
+> HashSet基于HashMap实现
+
+
+### 常见的RuntimeException
+> NullPointerException    NumberFormatException    IndexOutOfBoundsException    IllegalArgumentException    ClaasCastException. etc
+
+
+### Java反射
+> 指在程序运行状态中 可以构造任意一个类的对象 可以了解任意一个对象所属的类 成员变量 方法 可以调用任意一个对象的属性和方法
+
+### IO NIO
+> 阻塞IO 非阻塞IO 多路复用IO 信号驱动IO 异步IO
+> NIO的核心组件  channel  buffer  selector
