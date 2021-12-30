@@ -29,13 +29,12 @@ public class CodeOfHashMap {
      * 数组越小 碰撞越大 数组越大 碰撞越小 时间空间如何取舍
      * 链表越来越长怎么优化
      * 随着元素的不断添加 数组长度不足扩容时 怎么把原有的元素拆分到新位置上去
-     * @param list
      */
     public static void easyMap(List<String> list){
         String[] tab = new String[8];
         for(String key : list){
             int idx = key.hashCode() & (tab.length - 1);
-            System.out.println(String.format("key : %s Idx : %d", key, idx));
+            System.out.printf("key : %s Idx : %d%n", key, idx);
             if(tab[idx] == null){
                 tab[idx] = key;
                 continue;
