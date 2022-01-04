@@ -7,6 +7,7 @@ import java.math.BigInteger;
 /**
  * ++操作并非原子的
  * 存在竞态条件 线程不安全
+ * 读取-修改-写入 的竞态条件
  */
 @NotThreadSafe
 public class UnsafeCountingFactorizer {
