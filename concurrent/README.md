@@ -5,3 +5,12 @@
 
 ### shared
 > 共享和发布对象 使它们能够安全地由多个线程同时访问
+> 
+### combination
+> 对象的组合
+> 
+### module
+> 基础模块的构建
+> 
+### taskexecution
+> 任务执行
