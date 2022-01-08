@@ -32,6 +32,14 @@
         <module>data-structure</module>
         <module>algorithm</module>
         <module>basic</module>
+        <module>spring</module>
+        <module>dubbo</module>
+        <module>netty</module>
+        <module>network</module>
+        <module>sql</module>
+        <module>springcloud</module>
+        <module>mq</module>
+        <module>redis</module>
     </modules>
 
     <dependencies>
