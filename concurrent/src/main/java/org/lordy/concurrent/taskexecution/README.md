@@ -31,3 +31,7 @@
 - ExecutorService在初始创建时处于运行状态
 - shutdown方法将执行平缓的关闭过程： 不再接受新的任务，同时等待已经提交的任务执行完成（包括那些还未开始执行的任务）  shutdownNow方法将执行粗暴的关闭过程： 它将尝试取消所有运行中的任务，并且不再启动队列中尚未开始执行的任务
 - 在ExecutorService关闭后提交的任务将由“拒绝执行处理器”来处理，它会抛弃任务，或者使得execute方法抛出一个未检查的RejectedExecutionException。等待所有任务都完成后，ExecutorService将转入终止状态 可以调用awaitTermination来等待ExecutorService到达终止状态，或者通过调用isTerminated来轮训ExecutorService是否已经终止  通常在调用awaitTermination之后会立即调用shutdown 从而产生同步的关闭ExecutorService的效果
+
+### 延迟任务与周期任务
+> Timer 负责管理延迟任务或周期任务 存在一些缺陷 考虑使用ScheduledThreadPoolExecutor来代替
+> Timer在执行所有定时任务时只会创建一个线程 如果某个任务的执行时间长 那么将破坏其他TimerTask的定时精确性； TimerTask如果抛出一个未检查的异常 Timer线程并不捕获异常 将终止定时线程 这种情况下 Timer也不会恢复线程的执行 错误地认为整个Timer被取消 因此 已经被调度但尚未执行的TimerTask将不会再执行 新的任务也不能被调度（线程泄露）
