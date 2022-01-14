@@ -35,3 +35,11 @@
 ### 延迟任务与周期任务
 > Timer 负责管理延迟任务或周期任务 存在一些缺陷 考虑使用ScheduledThreadPoolExecutor来代替
 > Timer在执行所有定时任务时只会创建一个线程 如果某个任务的执行时间长 那么将破坏其他TimerTask的定时精确性； TimerTask如果抛出一个未检查的异常 Timer线程并不捕获异常 将终止定时线程 这种情况下 Timer也不会恢复线程的执行 错误地认为整个Timer被取消 因此 已经被调度但尚未执行的TimerTask将不会再执行 新的任务也不能被调度（线程泄露）
+> 
+> Runnable和Callable描述的都是抽象的计算任务。这些任务通常是有范围的 即都有一个明确的起始点 并且最终都会结束  
+> Executor执行任务有4个生命周期阶段： 创建、提交、开始和完成  在Executor框架中 已提交但尚未开始的任务都可以取消 对于那些已经开始执行的任务 只有它们能响应中断时才能取消
+> Future表示一个任务的生命周期 并提供了相应的方法判断是否已经完成或者取消 以及获取任务的结果或取消任务等
+> 
+> CompletionService：Executor与BlockingQueue
+> CompletionService将Executor和BlockingQueue的功能融合在一起 可以将Callable任务提交给它执行 使用类似队列操作的take和poll等方法来获得已完成的结果 这些结果会再完成时封装成为Future
+> ExecutorCompletionService实现了CompletionService  在构造函数中创建一个BlockingQueue来保存计算完成的结果 当计算完成时 调用FutureTask的done方法  当提交某个任务时 该任务首先包装称谓一个QueueingFuture 在改写done方法 并将结果放入BlockingQueue
