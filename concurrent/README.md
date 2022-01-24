@@ -31,4 +31,10 @@
 >  
 > 
 ### AQS
-> head  tail  thread 
+> head  tail  thread waitstatus
+> 
+```Node t = tail; // Read fields in reverse initialization order
+Node h = head;
+Node s;
+return h != t &&
+((s = h.next) == null || s.thread != Thread.currentThread());```
