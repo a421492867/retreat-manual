@@ -40,6 +40,7 @@
         <module>springcloud</module>
         <module>mq</module>
         <module>redis</module>
+        <module>mybatis</module>
     </modules>
 
     <dependencies>
