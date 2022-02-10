@@ -1,5 +1,19 @@
 #JVM
 
+### JVM中那些可以作为GC root
+> 栈中的本地变量  方法区中的静态变量   本地方法栈中的变量  正在运行的线程
+> 
+### JVM中哪些是线程共享的
+> 堆区和方法区是所有线程共享的   栈 本地方法栈  程序计数器是每个线程独有的
+> 
+> 
+### 类加载器双亲委派模型
+> JVM中存在三个默认的类加载器 :  BootstrapClassLoader  ExtClassLoader  APPClassLoader
+> APPClassLoader的父加载器是ExtClassLoader  ExtClassLoader的父加载器是BootstrapClassLoader
+> JVM在加载一个类时, 会调用APPClassLoader的loadClass方法来加载这个类 不过在这个方法中 会先使用ExtClassLoader的loadClass方法来加载类  同样ExtClassLoader的loadClass方法会先使用BootstrapClassLoader来加载类, 如果BootstrapClassLoader加载到了就直接成功 没有加载到 那么ExtClassLoader尝试加载 如果没有加载到 APPClassLoader来加载这个类
+> 所以 双亲委派指的是 JVM在加载类时 会委派给Ext和Bootstrap进行加载 如果没有加载到才由自己进行加载
+
+
 ![avatar](./img/运行时数据区域.png)
 
 ## 程序计数器 （线程私有）
