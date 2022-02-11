@@ -41,6 +41,7 @@
         <module>mq</module>
         <module>redis</module>
         <module>mybatis</module>
+        <module>ditributed</module>
     </modules>
 
     <dependencies>
