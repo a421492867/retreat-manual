@@ -43,7 +43,7 @@
 > ApplicationContext继承BeanFactory   还继承了其他接口 从而ApplicationContext能够 国际化 时间发布等功能 这是BeanFactory不具备的
 
 ### Spring中什么时候@Transactional会失效
-> 因为Spring事务是基于代理来实现的 所以某个加了@Transactional的方法只有是被代理对象调用时 这个注解才会生效  所以如果是被代理对象来调用这个方法 那么@Transactional是不会生效的
+> A B两个方法在同一个类  B有@Transactional A没有 A调用B  外部方法调用A B的事务失效
 > 同时如果某个方法时private的 @Transactional也会失效 因为底层cglib是基于父子类来实现的  子类不能重载父类private方法
 > 
 >
