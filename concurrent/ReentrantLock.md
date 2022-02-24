@@ -434,5 +434,152 @@ static {
 
 *用于挂起当前线程 阻塞调用占 返回当前线程的中断状态*
 
+#### CANCELLED状态节点生成
+
+*acquireQueued方法中的Finally代码*
+
+```java
+cancelAcquire(node);
+```
+
+```java
+    private void cancelAcquire(Node node) {
+        // Ignore if node doesn't exist
+        if (node == null)
+            return;
+
+      // 设置该节点不关联任何线程 也就是虚节点
+        node.thread = null;
+
+        // Skip cancelled predecessors
+        Node pred = node.prev;
+        while (pred.waitStatus > 0)
+            node.prev = pred = pred.prev;
+
+        // predNext is the apparent node to unsplice. CASes below will
+        // fail if not, in which case, we lost race vs another cancel
+        // or signal, so no further action is necessary.
+        Node predNext = pred.next;
+
+        // Can use unconditional write instead of CAS here.
+        // After this atomic step, other Nodes can skip past us.
+        // Before, we are free of interference from other threads.
+        node.waitStatus = Node.CANCELLED;
+
+        // If we are the tail, remove ourselves.
+        if (node == tail && compareAndSetTail(node, pred)) {
+            compareAndSetNext(pred, predNext, null);
+        } else {
+            // If successor needs signal, try to set pred's next-link
+            // so it will get one. Otherwise wake it up to propagate.
+            int ws;
+            if (pred != head &&
+                ((ws = pred.waitStatus) == Node.SIGNAL ||
+                 (ws <= 0 && compareAndSetWaitStatus(pred, ws, Node.SIGNAL))) &&
+                pred.thread != null) {
+                Node next = node.next;
+                if (next != null && next.waitStatus <= 0)
+                    compareAndSetNext(pred, predNext, next);
+            } else {
+                unparkSuccessor(node);
+            }
+
+            node.next = node; // help GC
+        }
+    }
+```
+
+> 1.获取当前节点的前驱节点 如果前驱节点状态是CANCELLED 就一直往前遍历，找到第一个waitStatus <= 0的节点 将找到的Pred节点和当前节点的Node关联 将当前Node设置为CANCELLED，根据当前节点 考虑三种情况
+>
+> 1.1 当前节点是尾节点： tail指向pred  pred.next指为null
+>
+> 1.2 当前节点是Head的后继节点： 唤醒当前节点的后继节点
+>
+> 1.3 当前节点不是Head的后继节点，也不是尾节点：判断当前节点前驱节点为SIGNAL或 把前驱节点设置为SINGAL看是否成功；判断前驱节点不是null，都满足则把当前节点的前驱节点的后继指针指向当前节点的后继节点 
+
+#### 如何解锁
+
+```java
+    public void unlock() {
+        sync.release(1);
+    }
+```
+
+```java
+    public final boolean release(int arg) {
+      // tryRelease如果返回true 说明该锁没有被任何线程持有
+        if (tryRelease(arg)) {
+          // 获取头节点
+            Node h = head;
+          // 头节点不为空且 头节点ws不是初始化节点情况 解除线程挂起状态
+            if (h != null && h.waitStatus != 0)
+                unparkSuccessor(h);
+            return true;
+        }
+        return false;
+    }
+```
+
+*h != null && h.waitStatus != 0*
+
+> h == null。Head还没初始化。 初始化情况下。head == null 第一个节点入队 head会被初始化一个虚拟节点。所以说 这里如果还没来得及入队 就会出现head == null的状况
+>
+> h != null && waitStatus == 0 表明后继节点对应的线程仍在运行中 不需要唤醒
+>
+> h != null && waitStatus <0 表明后继节点可能被阻塞了 需要唤醒
+
+
+
+```java
+        protected final boolean tryRelease(int releases) {
+          // 减少可重入次数
+            int c = getState() - releases;
+          // 当前线程不是持有锁的线程。抛出异常
+            if (Thread.currentThread() != getExclusiveOwnerThread())
+                throw new IllegalMonitorStateException();
+            boolean free = false;
+          // 如果持有线程全部释放。则当前独占锁的所有线程设置为null 并更新state
+            if (c == 0) {
+                free = true;
+                setExclusiveOwnerThread(null);
+            }
+            setState(c);
+            return free;
+        }
+```
+
+
+
+```java
+    private void unparkSuccessor(Node node) {
+        /*
+         * If status is negative (i.e., possibly needing signal) try
+         * to clear in anticipation of signalling.  It is OK if this
+         * fails or if status is changed by waiting thread.
+         */
+        int ws = node.waitStatus;
+        if (ws < 0)
+            compareAndSetWaitStatus(node, ws, 0);
+
+        /*
+         * Thread to unpark is held in successor, which is normally
+         * just the next node.  But if cancelled or apparently null,
+         * traverse backwards from tail to find the actual
+         * non-cancelled successor.
+         */
+        Node s = node.next;
+        if (s == null || s.waitStatus > 0) {
+            s = null;
+            for (Node t = tail; t != null && t != node; t = t.prev)
+                if (t.waitStatus <= 0)
+                    s = t;
+        }
+        if (s != null)
+            LockSupport.unpark(s.thread);
+    }
+```
+
+*从后往前找第一个非Cancelled节点原因：addWaiter方法 node.prev = pred; compareAndSetTail(pred, node) 这个操作并不是原子操作  这两个地方可以看作Tail入队 但是如果pred.next = node还没执行 如果这时候执行了unparkSuccessor方法 就没办法从前往后找了。还有一个原因是因为产生CANCELLED状态节点的时候 先断开的是Next指针， Prev指针并未断开*
+
 
 
