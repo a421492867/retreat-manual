@@ -16,7 +16,7 @@ _ctl 是对线程池运行状态和线程池中有效线程数量进行控制。
 
 **运行状态有5种， RUNNING：能接受新提交的任务，并且也能处理阻塞队列中的任务；SHUTDOWN：关闭状态，不再接受新提交的任务，却可以继续处理阻塞队列中已保存的任务；STOP：不能接受新任务，也不处理队列中的任务，会中断正在处理任务的线程；TIDYING：所有任务都已经终止，wokerCount为0；TERMINATED：terminated()方法执行完成后进入该状态**
 
-![alt](./img/ThreadLocalLifeCycle.png)
+![alt](./img/ThreadPoolLifeCycle.png)
 
 
 
