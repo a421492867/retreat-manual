@@ -11,3 +11,29 @@
 
 ## 了解Bean的一生
 
+*容器启动之后 拥有所有对象BeanDefinition来保存实例化阶段将要用的必要信息 只有调用BeanFactory的getBean方法来请求某个对象实例的时候 才有可能触发Bean实例化阶段的活动  可以被客户端显式调用getBean 也可以在容器内部隐式调用*
+
+> 1.实例化Bean对象
+>
+> 2.设置对象属性
+>
+> 3.检查Aware相关接口并设置相关依赖
+>
+> 4.BeanPostProcessor前置处理
+>
+> 5.检查是否是InitializingBean以决定是否调用afterPropertiesSet方法
+>
+> 6.检查是否配置有自定义的init-method
+>
+> 7.BeanPostProcessor后置处理
+>
+> 8.注册必要的Destruction相关回调接口
+>
+> 9.使用中
+>
+> 10.是否实现DisposableBean接口
+>
+> 11.是否配置有自定义的destroy方法
+
+
+
