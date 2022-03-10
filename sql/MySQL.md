@@ -96,3 +96,76 @@
 > 2.change buffer写入  redo log fsync未commit, binlog 已经fsync到磁盘 先从binlog 恢复 redo log 再从redo log恢复 change buffer
 >
 > 3.change buffer写入 redo log 和 binlog 都fsync  直接从redolog恢复
+
+## redo log写入方式
+
+> redo log包括两部分内容  内存中的日志缓冲   和   磁盘上的日志文件
+>
+> MySQL每执行一条DML语句  会先把记录写入 redo log buffer(用户空间)  再保存到内核空间的缓冲区OS-buffer中  后续某个时间点再一次性多个操作记录到redo log file(刷盘)  这种先写日志,再写磁盘的技术 就是WAL
+>
+> redo log buffer写到 redo log file  是经过OS buffer中转的  
+>
+> 0: 延迟写; 1:实时写; 2:实时写 延迟刷
+
+## redo log执行流程
+
+> 1.MySQL客户端将请求语句发往MySQL Server层
+>
+> 2.接到SQL请求后  对其进行 分析 优化 执行等处理工作  将生成的SQL执行计划发到InnoDB存储引擎层中执行
+>
+> 3.InnoDB存储引擎将修改操作记录到内存中
+>
+> 4.记录到内存以后会修改redo log日志 添加一行记录 内容是 需要在哪个数据页上做什么修改
+>
+> 5.此后  将事务的状态设置为 prepare 说明已经准备好提交事务了
+>
+> 6.等到MySQL Server层处理完事务后 将事务状态设置为commit  也就是提交该事务
+>
+> 7.在收到事务提交请求以后,redo log会把刚才写入内存中的操作记录写入到磁盘 从而完成整个日志的记录过程
+
+
+
+## binlog是什么 起到什么作用 
+
+> binlog是归档日志 属于MySQL Server层的日志   可以实现 主从复制 和 数据恢复
+>
+> 当需要恢复数据时  可以取出某个时间范围内的binlog进行重放恢复
+>
+> binlog不可以做crash safe  因为 crash之前 binlog可能没有写入完全 mysql就挂了 需要配合redo log才可以进行crash safe
+
+
+
+## 什么是两阶段提交
+
+> MySQL将redo log的写入拆成两个步骤 : prepare 和 commit  中间再穿插写入binlog
+>
+> 执行器想要更新记录R -> InnoDB将记录R加载进Buffer Pool -> 将记录R旧值写入 undo log便于回滚 -> 执行器更新内存中的数据(此时该数据页为脏页) -> 执行器写 redo log(prepare) -> 执行器写binlog -> 执行器写 redo log(commit)
+
+
+
+## MySQL怎么知道binlog是完整的
+
+> 一个事务的binlog是有完整格式的:
+>
+> statement格式的binlog, 最后会有commit;
+>
+> row格式的binlog 最后会有一个XID event
+
+
+
+## 什么是WAL技术  有什么有点
+
+> Write-Ahead Logging  它的关键点就是日志先写内存 再写磁盘. MySQL执行更新操作后,在真正把数据写入到磁盘前 先记录日志
+>
+> 好处 : 不用每一次操作都实时把数据写盘 就算crash后也可以通过 redo log恢复  所以能够实现快速响应SQL语句
+
+
+
+## binlog日志三种格式
+
+> statement : 基于SQL语句的复制
+>
+> row : 基于行的复制
+>
+> mixed : 混合模式复制
+
