@@ -72,7 +72,7 @@
 
 > Producer端在发送消息的时候, 会先根据Topic找到指定的TopicPublishInfo, 在获取了TopicPublishInfo路由信息后,RocketMQ的客户端在默认方式下 selectOneMessageQueue()方法会从TopicPublishInfo中的messageQueueList中选择一个队列进行发送消息.
 >
-> 具体容错策略在MQFaultStrategy类中定义  有一个sendLatencyFaultEnable开关变量.如果开启 在随机递增模的基础上,再过滤掉not available的Broker代理.latencyFaultTolerance 指对之前失败的 按一定时间做逼退. 比如 上次请求的latency超过550Lms 就退避3000Lms;   如果关闭 采用随机递增取模的方式选择一个队列来发送消息
+> 具体容错策略在MQFaultStrategy类中定义  有一个sendLatencyFaultEnable开关变量.如果开启 在随机递增模的基础上,再过滤掉not available的Broker代理.latencyFaultTolerance 指对之前失败的 按一定时间做退避. 比如 上次请求的latency超过550Lms 就退避3000Lms;   如果关闭 采用随机递增取模的方式选择一个队列来发送消息
 
 ### Consumer的负载均衡
 
