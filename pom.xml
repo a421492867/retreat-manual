@@ -50,6 +50,7 @@
         <module>mybatis</module>
         <module>ditributed</module>
         <module>os</module>
+        <module>k8s</module>
     </modules>
 
     <dependencies>
